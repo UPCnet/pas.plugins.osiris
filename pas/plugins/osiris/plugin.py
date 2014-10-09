@@ -2,13 +2,17 @@ from AccessControl.SecurityInfo import ClassSecurityInfo
 from App.class_init import default__class_init__ as InitializeClass
 from OFS.Cache import Cacheable
 from zope.interface import implements
+from zope.component import queryUtility
 
 from Products.PluggableAuthService.plugins.BasePlugin import BasePlugin
 from Products.PluggableAuthService.interfaces.plugins import IExtractionPlugin
+from Products.PluggableAuthService.interfaces.plugins import IRolesPlugin
 from Products.PluggableAuthService.interfaces.plugins import IAuthenticationPlugin
 
-from pas.plugins.osiris.interface import IOsirisHelper
+from plone.registry.interfaces import IRegistry
 
+from pas.plugins.osiris.interface import IOsirisHelper
+from mrs.max.browser.controlpanel import IMAXUISettings
 import requests
 
 
@@ -18,7 +22,7 @@ class OsirisHelper(BasePlugin, Cacheable):
     meta_type = 'Osiris Helper'
     security = ClassSecurityInfo()
 
-    implements(IOsirisHelper, IExtractionPlugin, IAuthenticationPlugin)
+    implements(IOsirisHelper, IExtractionPlugin, IAuthenticationPlugin, IRolesPlugin)
 
     oauth_server = 'https://oauth.upcnet.es'
 
@@ -62,5 +66,16 @@ class OsirisHelper(BasePlugin, Cacheable):
 
         login = credentials['login']
         return (login, login)
+
+    def getRolesForPrincipal(self, principal, request=None):
+        """
+            Grant api access if the current configured
+            restricted user is the user currently logged in
+        """
+        registry = queryUtility(IRegistry)
+        maxui_settings = registry.forInterface(IMAXUISettings)
+        if maxui_settings.max_restricted_username == principal.getUserName():
+            return ['Api']
+        return []
 
 InitializeClass(OsirisHelper)
