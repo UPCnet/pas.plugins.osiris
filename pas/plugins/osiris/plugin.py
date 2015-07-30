@@ -42,7 +42,6 @@ class OsirisHelper(BasePlugin, Cacheable):
     def extractCredentials(self, request):
         ''' Extract credentials from request '''
         creds = {}
-
         if request.get_header('X-Oauth-Username') and \
            request.get_header('X-Oauth-Token') and \
            request.get_header('X-Oauth-Scope'):
@@ -50,10 +49,7 @@ class OsirisHelper(BasePlugin, Cacheable):
             token = request.get_header('X-Oauth-Token')
             scope = request.get_header('X-Oauth-Scope')
 
-            if 'upc.edu' in self.oauth_server:  # Shame on you UPC!
-                data = dict(user_id=username, oauth_token=token, scope=scope)
-            else:
-                data = dict(username=username, access_token=token, scope=scope)
+            data = dict(username=username, access_token=token, scope=scope)
             req = requests.post("{}/checktoken".format(self.oauth_server), data=data)
             if req.status_code == 200:
                 creds['login'] = username
