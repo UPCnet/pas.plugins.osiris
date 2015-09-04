@@ -1,11 +1,11 @@
 Changelog
 =========
 
-1.2 (unreleased)
+1.2 (2015-09-04)
 ----------------
 
-- Nothing changed yet.
-
+* remove check in oauth_server,always send username in requests [Paco Gregori]
+* Assign Api role on restricted user login [Carles Bruguera]
 
 1.1 (2014-03-24)
 ----------------
